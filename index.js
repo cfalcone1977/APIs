@@ -2,39 +2,51 @@
 cuit=document.getElementById('CUIT');
 boton_consulta=document.getElementById('boton');
 panel=document.getElementById('panelInformacion');
+datos=document.getElementById('datosCliente');
 const urlConsultaCuit="https://api.bcra.gob.ar/centraldedeudores/v1.0/Deudas/";
+
+//function mostrarDatosCliente(CLIENTE){
+//    console.log("   CUIT: "+ cliente.results.identificacion);
+//}
+
 
 function consultaCUIT(numero_cuit) {
     try {
         console.log(urlConsultaCuit+numero_cuit.value);
         fetch(urlConsultaCuit+numero_cuit.value)
          .then(res=>res.json())
-         .then(data=>{console.log(" NOMBRE: "+data.results.denominacion);
-            console.log("   CUIT: "+data.results.identificacion);
-            console.log("PERIODO: "+data.results.periodos[0].periodo);
-            const CantBancosOperados=data.results.periodos[0].entidades.length;
-            console.log("BANCOS: ");
-            console.log("====================================");            
-            for (let i = 0; i < CantBancosOperados; i=i+1) {    //FALTA ORDENAR BANCOS POR MAYOR DEUDA
-              const pEntidad=document.createElement('pre');
-              const monto=(Number(data.results.periodos[0].entidades[i].monto))*1000
-              const montoS=monto.toLocaleString();
-              const situacion=data.results.periodos[0].entidades[i].situacion;
-              if ((situacion>1) && (situacion<=2)){
-                                        panel.style.backgroundColor='yellow';
-                              } else if (situacion>=3) {
-                                                        panel.style.backgroundColor='red';
-                                                       }
+         .then(data=>{
+            //*******CREANDO DATOS CLIENTE********//
+            const pDatosNombre=document.createElement('pre'); // creo elemento pDatosNombre en seccion datosCliente
+            pDatosNombre.textContent=`Nombre: ${data.results.denominacion}`;
+            datos.appendChild(pDatosNombre);
 
-              const situacionS=situacion.toLocaleString();
+            const pDatosPeriodo=document.createElement('pre'); // creo elemento pDatosPeriodo en seccion datosCLiente
+            pDatosPeriodo.textContent=`Estado al: ${data.results.periodos[0].periodo}`;
+            datos.appendChild(pDatosPeriodo);
+
+            const CantBancosOperados=data.results.periodos[0].entidades.length; // determino la cantidad de Bancos
+         
+            for (let i = 0; i < CantBancosOperados; i=i+1) {    //bucle para recorrer los bancos
+              const pEntidad=document.createElement('pre');   // creo elemento pEntidad en seccion panel
+              const monto=(Number(data.results.periodos[0].entidades[i].monto))*1000; //transformo en numero para multiplicar por 1000
+              const montoS=monto.toLocaleString(); // transformo en String para poder asignar una cantidad de caracteres fija luego
+              const situacion=data.results.periodos[0].entidades[i].situacion;
+              if ((situacion>1) && (situacion<=2)){  // creo condiciones para darle color dependiendo situacion **faltaria verde en 1**
+                                        panel.style.backgroundColor='yellow'; //situacion >1 y <=2 amarillo
+                              } else if (situacion>=3) {
+                                                        panel.style.backgroundColor='red';//situacion >=3 rojo
+                                                       }                       
+
+              const situacionS=situacion.toLocaleString(); //transformo en strng para poder darle una cantidad fija de caracteres
               pEntidad.textContent=data.results.periodos[0].entidades[i].entidad.padStart(45) +"   $"+ montoS.padStart(12) + "   " + situacionS.padStart(3);
-              panelInformacion.appendChild(pEntidad);
+              panel.appendChild(pEntidad);
               console.log(data.results.periodos[0].entidades[i].entidad);
               console.log(" DEUDA: "+"$ "+(Number(data.results.periodos[0].entidades[i].monto))*1000+" expresada en miles (x 1000)");
               console.log(data.results.periodos[0].entidades[i].situacion)
               console.log("====================================");
             }
-            return data;
+            //return data;
            })
     } catch (error) {
         console.error("Error al cargar consulta CUIT:", error);
