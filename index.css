@@ -1,0 +1,35 @@
+
+#superior{
+    display: flex;
+    gap: 10px;
+}
+h1{
+    text-align: center;
+}
+#ingresoCUIT,#datosCliente {
+    font-size: 15px;
+    font-family: monospace;
+    text-align: center;
+    border:1px solid beige;
+    border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    height: 150px;
+    margin-top: 10px;
+    box-shadow: 5px 5px 10px black;
+    }
+#panelInformacion{
+    font-size: 15px;
+    font-family: monospace;
+    border:1px solid beige;
+    border-radius: 10px;
+    padding: 15px;
+    width: 640px;
+    height: 300px;
+    margin-top: 10px;
+    box-shadow: 5px 5px 10px black;
+}
+
+
+
+
