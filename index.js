@@ -5,15 +5,13 @@ contenedor_situacion=document.getElementById('panelInformacion')
 datos=document.getElementById('contenedor_datos_cliente');  //DATOS CLIENTE (info)
 panel=document.getElementById('contenedor_situacion_bancos'); //SITUACION EN BANCOS (info)
 
-
 const urlConsultaCuit="https://api.bcra.gob.ar/centraldedeudores/v1.0/Deudas/";
 
-function mostrarDatosCliente(datosC){
-    const pDatosNombre=document.createElement('pre'); // creo elemento pDatosNombre en seccion datosCliente
+function mostrarDatosCliente(datosC){  //Trabaja sobre el elemento p "contenedor_datos_cliente" que esta en section: "datosCliente"
+    const pDatosNombre=document.createElement('pre'); // creo elemento pre "pDatosNombre" en seccion "datosCliente"
     pDatosNombre.textContent=`Nombre: ${datosC.results.denominacion}`;
     datos.appendChild(pDatosNombre);
-
-    const pDatosPeriodo=document.createElement('pre'); // creo elemento pDatosPeriodo en seccion datosCLiente
+    const pDatosPeriodo=document.createElement('pre'); // creo elemento pre "pDatosPeriodo" en seccion "datosCLiente".
     pDatosPeriodo.textContent=`Estado al: ${datosC.results.periodos[0].periodo}`;
     datos.appendChild(pDatosPeriodo);
 }
@@ -58,7 +56,7 @@ function limpiarDatos(){
 function mostrarError(estadoError){
     const Error=document.createElement('pre'); // creo elemento ERROR en seccion datosCliente
     Error.textContent=`${estadoError}`;
-    datos.appendChild(Error);
+    panel.appendChild(Error);
 }
 
 cuit.addEventListener('click', ()=>{ //limpiar datos y panel cuando hago click para ingresar CUIT
@@ -67,16 +65,24 @@ cuit.addEventListener('click', ()=>{ //limpiar datos y panel cuando hago click p
 boton_consulta.addEventListener(`click`, async()=>{
        if (cuit.value!="") {
                   const CLIENTE= await consultaCUIT(cuit);
-                  if (CLIENTE.status=200) {    // AQUI INTENTO CONTROLAR TEMA ERROR, me pasa algo raro cuando pido de un CUIT
-                    console.log(CLIENTE.status);    // me pasa algo raro cuando pido de un CUIT
-                    mostrarDatosCliente(CLIENTE);    // con el CUIT 220228864936 me da error 404 pero luego para a 200 OK
+                  if (CLIENTE.status>=400){
+                                          mostrarError(CLIENTE.errorMessages[0])
+                                          console.log("problema: " + CLIENTE.errorMessages[0]);
+                                          }
+                  if (CLIENTE.status=200) {   
+                    mostrarDatosCliente(CLIENTE);
                     mostrarEntidadesOperadas(CLIENTE);
-                                          } else {
-                                              mostrarError(CLIENTE.status);
-                                                 }
+                                          } 
                   }
 
 })
+
+
+
+
+
+
+
 
 
 
