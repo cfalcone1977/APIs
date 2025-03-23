@@ -1,22 +1,96 @@
 
 cuit=document.getElementById('CUIT');
 boton_consulta=document.getElementById('boton');
-panel=document.getElementById('panelInformacion');
-datos=document.getElementById('datosCliente');
+contenedor_situacion=document.getElementById('panelInformacion')
+datos=document.getElementById('contenedor_datos_cliente');  //DATOS CLIENTE (info)
+panel=document.getElementById('contenedor_situacion_bancos'); //SITUACION EN BANCOS (info)
+
+
 const urlConsultaCuit="https://api.bcra.gob.ar/centraldedeudores/v1.0/Deudas/";
 
-//function mostrarDatosCliente(CLIENTE){
-//    console.log("   CUIT: "+ cliente.results.identificacion);
-//}
+function mostrarDatosCliente(datosC){
+    const pDatosNombre=document.createElement('pre'); // creo elemento pDatosNombre en seccion datosCliente
+    pDatosNombre.textContent=`Nombre: ${datosC.results.denominacion}`;
+    datos.appendChild(pDatosNombre);
+
+    const pDatosPeriodo=document.createElement('pre'); // creo elemento pDatosPeriodo en seccion datosCLiente
+    pDatosPeriodo.textContent=`Estado al: ${datosC.results.periodos[0].periodo}`;
+    datos.appendChild(pDatosPeriodo);
+}
+
+async function consultaCUIT(numero_cuit) {
+    try {
+        const response = await fetch(urlConsultaCuit+numero_cuit.value);
+        const data = await response.json();
+        console.log(data.status);
+        return data;// un objeto data con diferentes propiedades, otros objetos y arreglos.
+    } catch (error) {
+        console.error("Error al cargar los personajes:", error.status);
+        return null;//si da error se devuelve una array vacio
+    }
+}
 
 
-function consultaCUIT(numero_cuit) {
+function mostrarEntidadesOperadas(datosE){
+    const CantBancosOperados=datosE.results.periodos[0].entidades.length; // determino la cantidad de Bancos     
+    for (let i = 0; i < CantBancosOperados; i=i+1) {    //bucle para recorrer los bancos
+      const pEntidad=document.createElement('pre');   // creo elemento pEntidad en seccion panel
+      const monto=(Number(datosE.results.periodos[0].entidades[i].monto))*1000; //transformo en numero para multiplicar por 1000
+      const montoS=monto.toLocaleString(); // transformo en String para poder asignar una cantidad de caracteres fija luego
+      const situacion=datosE.results.periodos[0].entidades[i].situacion;                      
+      const situacionS=situacion.toLocaleString(); //transformo en strng para poder darle una cantidad fija de caracteres
+      pEntidad.textContent=datosE.results.periodos[0].entidades[i].entidad.padStart(45) +"   $"+ montoS.padStart(12) + "   " + situacionS.padStart(3);
+      panel.appendChild(pEntidad);  
+      if ((situacion>1) && (situacion<=2)){  // creo condiciones para darle color dependiendo situacion **faltaria verde en 1**
+        contenedor_situacion.style.backgroundColor='yellow'; //situacion >1 y <=2 amarillo
+       } else if (situacion>=3) {
+                 contenedor_situacion.style.backgroundColor='red';//situacion >=3 rojo
+               } 
+}
+}
+function limpiarDatos(){
+    cuit.value="";
+    datos.innerHTML="";
+    panel.innerHTML="";
+    contenedor_situacion.style.backgroundColor="white"; 
+}
+
+function mostrarError(estadoError){
+    const Error=document.createElement('pre'); // creo elemento ERROR en seccion datosCliente
+    Error.textContent=`${estadoError}`;
+    datos.appendChild(Error);
+}
+
+cuit.addEventListener('click', ()=>{ //limpiar datos y panel cuando hago click para ingresar CUIT
+    limpiarDatos();
+})
+boton_consulta.addEventListener(`click`, async()=>{
+       if (cuit.value!="") {
+                  const CLIENTE= await consultaCUIT(cuit);
+                  if (CLIENTE.status=200) {    // AQUI INTENTO CONTROLAR TEMA ERROR, me pasa algo raro cuando pido de un CUIT
+                    console.log(CLIENTE.status);    // me pasa algo raro cuando pido de un CUIT
+                    mostrarDatosCliente(CLIENTE);    // con el CUIT 220228864936 me da error 404 pero luego para a 200 OK
+                    mostrarEntidadesOperadas(CLIENTE);
+                                          } else {
+                                              mostrarError(CLIENTE.status);
+                                                 }
+                  }
+
+})
+
+
+
+
+
+
+/*********************************PRUEBAS ANTERIORES*******************************************
+/*function consultaCUIT(numero_cuit) {
     try {
         console.log(urlConsultaCuit+numero_cuit.value);
         fetch(urlConsultaCuit+numero_cuit.value)
          .then(res=>res.json())
          .then(data=>{
-            //*******CREANDO DATOS CLIENTE********//
+            //*******CREANDO DATOS CLIENTE********
             const pDatosNombre=document.createElement('pre'); // creo elemento pDatosNombre en seccion datosCliente
             pDatosNombre.textContent=`Nombre: ${data.results.denominacion}`;
             datos.appendChild(pDatosNombre);
@@ -51,18 +125,7 @@ function consultaCUIT(numero_cuit) {
     } catch (error) {
         console.error("Error al cargar consulta CUIT:", error);
     }
-}
-
-function mostrarEntidadesOperadas(objetoCliente){
-    console.log(objetoCliente);
-}
-
-boton_consulta.addEventListener(`click`, ()=>{
-                  const CLIENTE=consultaCUIT(cuit);
-                  //console.log(CLIENTE);
-                  //mostrarEntidadesOperadas(CLIENTE);
-})
-
+}*/
 
 /*
 async function consultaCUIT(numero_cuit) {
