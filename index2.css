@@ -1,0 +1,30 @@
+/*.h1 {
+    font-size: 60px;
+  }*/
+
+.separacion-secciones {
+    width: calc(50% - 10px); /* Ajusta el ancho para tener en cuenta el margen */
+    margin: 0 5px; /* Margen horizontal de 5px */
+}
+
+@media (max-width: 767.98px) {
+  .separacion-secciones {
+    width: 100%;
+  }
+}
+#ingresoCUIT,#datosCliente{
+    font-family: monospace;
+    border:1px solid beige;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 5px 5px 10px black;
+    }
+#panelInformacion{
+    font-family: monospace;
+    border:1px solid beige;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 5px 5px 10px black;
+}

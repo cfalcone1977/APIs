@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="index2.css">
+    <title>Verificacion CLIENTE</title>  
+</head>
+<body>
+<div class="container text-center">
+    <div id="superior" class="row">
+        <section id="ingresoCUIT" class="col-sm-12 col-md-6 text-center separacion-secciones">
+            <h1 style="font-size: 25px;">DATOS A CHEQUEAR</h1>
+            <label for="">CUIT:</label>
+            <input id="CUIT" type="number" placeholder="20261346959">
+            <p></p>
+            <button id="boton" type="button" class="btn btn-dark">CONSULTA</button>
+        </section>
+        <section id="datosCliente" class="col-sm-12 col-md-6 text-center separacion-secciones">
+            <h1 style="font-size: 25px;">DATOS CLIENTE</h1>
+            <p id="contenedor_datos_cliente"></p>
+        </section>
+    </div>
+    <section id="panelInformacion" class="row" class="col-sm-12 text-center">
+        <h1 style="font-size: 25px;">SITUACION EN BANCOS</h1>
+        <p id="contenedor_situacion_bancos"></p>
+    </section>
+</div> 
+    <script src="./bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
