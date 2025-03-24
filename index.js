@@ -28,7 +28,6 @@ async function consultaCUIT(numero_cuit) {
     }
 }
 
-
 function mostrarEntidadesOperadas(datosE){
     const CantBancosOperados=datosE.results.periodos[0].entidades.length; // determino la cantidad de Bancos     
     for (let i = 0; i < CantBancosOperados; i=i+1) {    //bucle para recorrer los bancos
@@ -61,6 +60,7 @@ function mostrarError(estadoError){
 
 cuit.addEventListener('click', ()=>{ //limpiar datos y panel cuando hago click para ingresar CUIT
     limpiarDatos();
+    boton_consulta.disabled=false; // al hacer click en input activa boton nuevamente para proxxima consulta.  
 })
 boton_consulta.addEventListener(`click`, async()=>{
        if (cuit.value!="") {
@@ -72,6 +72,7 @@ boton_consulta.addEventListener(`click`, async()=>{
                   if (CLIENTE.status=200) {   
                     mostrarDatosCliente(CLIENTE);
                     mostrarEntidadesOperadas(CLIENTE);
+                    boton_consulta.disabled=true; //desactiva boton para no gener sobre impresiones al hacer click!!
                                           } 
                   }
 
