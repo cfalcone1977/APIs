@@ -21,10 +21,14 @@ async function consultaCUIT(numero_cuit) {
         const response = await fetch(urlConsultaCuit+numero_cuit.value);
         const data = await response.json();
         console.log(data.status);
+        if (data.status>=400){
+                                         throw new Error(data.errorMessages[0]);
+                             }
         return data;// un objeto data con diferentes propiedades, otros objetos y arreglos.
     } catch (error) {
-        console.error("Error al cargar los personajes:", error.status);
-        return null;//si da error se devuelve una array vacio
+        mostrarError(error.message);
+        //console.error("Error al acceder a CUIT:",error.message);
+        return null;//si da error se devuelve null
     }
 }
 
@@ -53,23 +57,22 @@ function limpiarDatos(){
 }
 
 function mostrarError(estadoError){
+    boton_consulta.disabled=true;
     const Error=document.createElement('pre'); // creo elemento ERROR en seccion datosCliente
     Error.textContent=`${estadoError}`;
     panel.appendChild(Error);
 }
 
 cuit.addEventListener('click', ()=>{ //limpiar datos y panel cuando hago click para ingresar CUIT
-    limpiarDatos();
-    boton_consulta.disabled=false; // al hacer click en input activa boton nuevamente para proxxima consulta.  
+    if (cuit.value.length==11) {  //Solo cuando el cuit posee 11 digitos, puede ser eliminado
+                     limpiarDatos(); //de lo contrario es posible corregir haciendo click en otra parte
+                     boton_consulta.disabled=false; // al hacer click en input activa boton nuevamente para proxxima consulta.
+                             } 
 })
 boton_consulta.addEventListener(`click`, async()=>{
-       if (cuit.value!="") {
+       if (cuit.value.length==11) {
                   const CLIENTE= await consultaCUIT(cuit);
-                  if (CLIENTE.status>=400){
-                                          mostrarError(CLIENTE.errorMessages[0])
-                                          console.log("problema: " + CLIENTE.errorMessages[0]);
-                                          }
-                  if (CLIENTE.status=200) {   
+                  if (CLIENTE != null)   { //(CLIENTE.status=200) {   
                     mostrarDatosCliente(CLIENTE);
                     mostrarEntidadesOperadas(CLIENTE);
                     boton_consulta.disabled=true; //desactiva boton para no gener sobre impresiones al hacer click!!
