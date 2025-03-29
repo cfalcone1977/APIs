@@ -6,6 +6,7 @@ datos=document.getElementById('contenedor_datos_cliente');  //DATOS CLIENTE (inf
 panel=document.getElementById('contenedor_situacion_bancos'); //SITUACION EN BANCOS (info)
 
 const urlConsultaCuit="https://api.bcra.gob.ar/centraldedeudores/v1.0/Deudas/";
+const urlConsultaCheques="https://api.bcra.gob.ar/centraldedeudores/v1.0/Deudas/ChequesRechazados/";
 
 function mostrarDatosCliente(datosC){  //Trabaja sobre el elemento p "contenedor_datos_cliente" que esta en section: "datosCliente"
     const pDatosNombre=document.createElement('pre'); // creo elemento pre "pDatosNombre" en seccion "datosCliente"
@@ -31,9 +32,31 @@ async function consultaCUIT(numero_cuit) {
         return null;//si da error se devuelve null
     }
 }
+async function consultaCheques(numero_cuit){
+    try {
+        const response = await fetch(urlConsultaCheques+numero_cuit.value);
+        const data= await response.json();
+        console.log(data);
+        console.log(data.results.causales[0]);
+        console.log(data.results.causales[0].causal);
+        let contCheques=0;
+        for (let i = 0; i < data.results.causales[0].entidades.length; i=i+1) {
+            for (let i2 = 0; i2 <data.results.causales[0].entidades[i].detalle.length ; i2=i2+1) {
+                console.log("Numero: " + data.results.causales[0].entidades[i].detalle[i2].nroCheque);
+                console.log("Monto: " + data.results.causales[0].entidades[i].detalle[i2].monto);   
+                contCheques=contCheques+1;
+            }
+        console.log(contCheques);
+        }
+    } catch (error) {
+          console.log(error.message);
+    }
+}
+
 
 function mostrarEntidadesOperadas(datosE){
     const CantBancosOperados=datosE.results.periodos[0].entidades.length; // determino la cantidad de Bancos     
+    let peorSituacion=1;
     for (let i = 0; i < CantBancosOperados; i=i+1) {    //bucle para recorrer los bancos
       const pEntidad=document.createElement('pre');   // creo elemento pEntidad en seccion panel
       const monto=(Number(datosE.results.periodos[0].entidades[i].monto))*1000; //transformo en numero para multiplicar por 1000
@@ -42,13 +65,24 @@ function mostrarEntidadesOperadas(datosE){
       const situacionS=situacion.toLocaleString(); //transformo en strng para poder darle una cantidad fija de caracteres
       pEntidad.textContent=datosE.results.periodos[0].entidades[i].entidad.padStart(45) +"   $"+ montoS.padStart(12) + "   " + situacionS.padStart(3);
       panel.appendChild(pEntidad);  
-      if ((situacion>1) && (situacion<=2)){  // creo condiciones para darle color dependiendo situacion **faltaria verde en 1**
-        contenedor_situacion.style.backgroundColor='yellow'; //situacion >1 y <=2 amarillo
-       } else if (situacion>=3) {
-                 contenedor_situacion.style.backgroundColor='red';//situacion >=3 rojo
-               } 
+      if (peorSituacion<situacion) {
+                                  peorSituacion=situacion;
+                                   }
 }
+if (peorSituacion==1){
+    contenedor_situacion.style.backgroundColor='green';
+} else if ((peorSituacion>1) && (peorSituacion<=2)){  // creo condiciones para darle color dependiendo situacion **faltaria verde en 1**
+              contenedor_situacion.style.backgroundColor='yellow'; //situacion >1 y <=2 amarillo
+                     } else if (peorSituacion>=3) {
+                             contenedor_situacion.style.backgroundColor='red';//situacion >=3 rojo
+                   } 
 }
+
+function mostrarChequesRechazados(){
+
+
+}
+
 function limpiarDatos(){
     cuit.value="";
     datos.innerHTML="";
@@ -78,6 +112,7 @@ boton_consulta.addEventListener(`click`, async()=>{
                     boton_consulta.disabled=true; //desactiva boton para no gener sobre impresiones al hacer click!!
                                           } 
                   }
+    consultaCheques(cuit);
 
 })
 
